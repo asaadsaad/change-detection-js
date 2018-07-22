@@ -2,12 +2,12 @@ class Storage {
     constructor() {
         this.subscribers = []
     }
-    subscribe() {
+    record() {
         if (target && !this.subscribers.includes(target)) {
             this.subscribers.push(target)
         }
     }
-    notify() {
+    replay() {
         this.subscribers.forEach(sub => sub())
     }
 }
@@ -19,11 +19,11 @@ let quantity = 2
 let total = 0
 
 let target = () => { total = price * quantity }
-storage.subscribe()
+storage.record()
 target()
 
 console.log(total) // => 10 
 price = 20
 console.log(total) // => 10 
-storage.notify()
+storage.replay()
 console.log(total) // => 40
