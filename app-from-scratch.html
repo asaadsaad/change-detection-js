@@ -1,0 +1,43 @@
+<div id="output"></div>
+<script src="https://unpkg.com/rxjs/bundles/rxjs.umd.min.js"></script>
+<script>
+    const { from } = rxjs;
+    const output = document.querySelector('#output')
+
+    class ChangeDetection {
+        constructor() {
+            this.actions = [];
+        }
+        addAction(f) {
+            this.actions.push(f);
+        }
+        getObservable() {
+            return from(this.actions)
+        }
+    }
+
+    cd = new ChangeDetection();
+    cd.addAction(() => console.log('Value has changed.. Recalculating BMI...'))
+    cd.addAction(() => BMI = Math.floor(data.weight / (data.height * data.height)))
+    cd.addAction(() => output.innerHTML = BMI)
+    const BMIObservable = cd.getObservable()
+
+    let BMI = 0;
+    let data = {}
+    data = { name: 'Asaad', height: 1.8, weight: 70 }
+    data = new Proxy(data, {
+        get: function (obj, key) {
+            console.log(`Reading ${key}`)
+            return obj[key]
+        },
+        set: function (obj, key, value) {
+            console.log(`Setting ${key} to ${value}`)
+            obj[key] = value;
+            BMIObservable.subscribe(f => f())
+        }
+    })
+
+    setTimeout(() => data.weight = 175, 2000);
+
+    window.onload = () => BMIObservable.subscribe(f => f())
+</script>
